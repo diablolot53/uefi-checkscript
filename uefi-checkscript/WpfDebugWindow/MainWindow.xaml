@@ -1,0 +1,22 @@
+﻿<Window x:Class="WpfDebugWindow.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfDebugWindow"
+        mc:Ignorable="d"
+        Title="uefi-checkscript - Debug" Height="191.597" Width="352.941" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="38*"/>
+                <ColumnDefinition Width="77*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="OkButton" Content="Ok" HorizontalAlignment="Left" Margin="16.353,122,0,0" VerticalAlignment="Top" Width="75" IsDefault="True" Grid.Column="1"/>
+            <Label Content="Boot Mode:" HorizontalAlignment="Left" Margin="38,26,0,0" VerticalAlignment="Top"/>
+            <Label x:Name="BootModeStatus" Content="UEFI|BIOS" HorizontalAlignment="Left" Margin="69.353,26,0,0" VerticalAlignment="Top" Grid.Column="1"/>
+            <Label Content="SecureBoot Enabled:" HorizontalAlignment="Left" Margin="38,57,0,0" VerticalAlignment="Top" Grid.ColumnSpan="2"/>
+            <Label x:Name="SecBootStatus" Content="Not Checked" HorizontalAlignment="Left" Margin="69.353,57,0,0" VerticalAlignment="Top" Grid.Column="1"/>
+        </Grid>
+    </Grid>
+</Window>

@@ -5,3 +5,7 @@
 /Notes.txt
 /.vs/uefi-checkscript/v15
 /.vs
+/uefi-checkscript/WpfApp1/obj/Debug
+/uefi-checkscript/WpfDebugWindow/bin/Debug
+/uefi-checkscript/WpfDebugWindow/obj/Debug
+/uefi-checkscript/.vs/uefi-checkscript/v15
