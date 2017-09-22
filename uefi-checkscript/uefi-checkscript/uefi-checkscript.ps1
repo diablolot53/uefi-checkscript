@@ -10,7 +10,10 @@ Param (
 )
 
 #-------------------------------------------------------------
+#Variables
+$Global:FormResult = $null          #Contains the returned value for a displayed form
 
+#-------------------------------------------------------------
 #Functions
 Function Get-BiosType {
 	#Function is derived from the code provided in the GetFirmwareType.ps1 script by Chris J Warwick - https://gallery.technet.microsoft.com/scriptcenter/Determine-UEFI-or-Legacy-7dc79488
@@ -129,7 +132,9 @@ Function DisplayWindow {
 		This function is based on the examples that can be found at 
 			https://foxdeploy.com/2015/04/10/part-i-creating-powershell-guis-in-minutes-using-visual-studio-a-new-hope/
 			and
-			https://foxdeploy.com/2015/04/16/part-ii-deploying-powershell-guis-in-minutes-using-visual-studio/ 
+			https://foxdeploy.com/2015/04/16/part-ii-deploying-powershell-guis-in-minutes-using-visual-studio/
+		To Do
+			Reconfigure the button logic to parse input values like what is done with the labels instead of coding each function manually
 	#>
 
 	#Parameters
@@ -137,6 +142,8 @@ Function DisplayWindow {
 		[parameter(Mandatory=$True)]
 		[String]$inputXML,
         [String]$OkButtonName,
+		[String]$ContinueButtonName,
+		[String]$RebootButtonName,
 		$labelText
 	)
 
@@ -162,7 +169,7 @@ Function DisplayWindow {
 	get-variable WPF*
 	}
  	
-	#Displays the editable variabled in the WPF form
+	#Displays the editable variables in the WPF form
 	#Get-FormVariables
  
 	#===========================================================================
@@ -170,10 +177,20 @@ Function DisplayWindow {
 	#===========================================================================
 
 	#Set the Ok button to close the form when clicked
-	If ($OkButtonName -ne $null){
+	If ($OkButtonName -ne ""){
 		(Get-Variable -Name "WPF$OkButtonName" -ValueOnly).Add_Click({$form.close()})
 	}
- 	
+
+	#Set the Continue button to return a "continue" value from the function when clicked
+	If ($ContinueButtonName -ne ""){
+		(Get-Variable -Name "WPF$ContinueButtonName" -ValueOnly).Add_Click({$Global:FormResult = "Continue";$form.close()})
+	}
+
+	#Set the Reboot button to return a "reboot" value from the function when clicked
+ 		If ($RebootButtonName -ne ""){
+		(Get-Variable -Name "WPF$RebootButtonName" -ValueOnly).Add_Click({$Global:FormResult = "Reboot";$form.close()})
+	}
+
 	#Modify the return labels to display values from the script
 	If ($labelText -ne $null){
 		ForEach ($l in $labelText){
@@ -205,7 +222,7 @@ If (($UEFIResults -eq "UEFI") -and ($SecureBoot -eq $true)){
 		If the computer supports Secure Boot and Secure Boot is enabled, then this cmdlet returns True. 
 		If the computer supports Secure Boot and Secure Boot is disabled, then this cmdlet returns False. 
 		#>
-	Catch{$SecureBootResult = "No"}
+	Catch{$SecureBootResult = "Not Supported"}
 		#If the computer does not support Secure Boot or is a BIOS (non-UEFI) computer, then this cmdlet returns an error displaying the following: Cmdlet not supported on this platform.
 }
 ElseIf (($UEFIResults -eq "Legacy BIOS") -and ($SecureBoot -eq $true)){
@@ -268,7 +285,7 @@ If ($Debug -eq $True){
 	DisplayWindow -inputXML $window -OkButtonName "OkButton" -labelText $labels
 }
 Else{
-	#Return return results of the check
+	#Return results of the UEFI check
 	#If UEFI is not enabled, display a notification and exit the script with an error
 	If ($UEFIResults -ne "UEFI"){
 		#Display a notification window
@@ -280,10 +297,10 @@ Else{
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfDebugWindow"
         mc:Ignorable="d"
-        Title="UEFI Error" Height="187.5" Width="349.794" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-    <Grid Margin="10,10,8,8">
-        <Label Content="UEFI is currently disabled&#xD;&#xA;" Margin="19,10,0,0" VerticalAlignment="Top" Height="27" Width="250" HorizontalContentAlignment="Center" HorizontalAlignment="Left"/>
-        <Label Content="Please reboot the system and enable UEFI from the &#xD;&#xA;firmware interface" Margin="10,37,4,0" VerticalAlignment="Top" Height="38" FontSize="11"/>
+        Title="UEFI Error" Height="187.5" Width="349.794" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" HorizontalAlignment="Center">
+    <Grid Margin="10,10,4,0" Height="141" VerticalAlignment="Top">
+        <Label Content="UEFI is currently disabled&#xD;&#xA;" Margin="19,10,0,0" VerticalAlignment="Top" Height="27" Width="250" HorizontalContentAlignment="Center" HorizontalAlignment="Center"/>
+        <Label Content="Please reboot the system and enable UEFI from the &#xD;&#xA;firmware interface" Margin="10,37,4,0" VerticalAlignment="Top" Height="38" FontSize="11" HorizontalAlignment="Center"/>
         <Button x:Name="OkButton" Content="Ok" Margin="114,93,0,10" Width="94" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left"/>
 
     </Grid>
@@ -296,12 +313,41 @@ Else{
 		Exit 1
 	}
 
-	#Display a notification if UEFI is enabled but Secureboot is turned off
+	#Display a notification if UEFI is enabled but SecureBoot is turned off
 	If (($SecureBoot -eq $true) -and ($SecureBootResult -eq $false)){
-		#Display a notification window
-		
+		#Display a notification window giving the user the option to either reboot the system or continue with the task sequence
+		$window = @'
+<Window x:Class="WpfDebugWindow.UEFINotification"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfDebugWindow"
+        mc:Ignorable="d"
+        Title="SecureBoot Error" Height="259.5" Width="470.794" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" HorizontalAlignment="Center">
+    <Grid Margin="10" Height="224" VerticalAlignment="Top" UseLayoutRounding="False">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Label Content="SecureBoot is currently disabled&#xA;" Margin="108,10,87,0" VerticalAlignment="Top" Height="27" Width="250" FontSize="14" FontWeight="Bold" HorizontalContentAlignment="Center"/>
+        <Button x:Name="ContinueButton" Content="Continue" Margin="108,165,0,0" Width="94" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Height="33" VerticalAlignment="Top"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,86,0,0" TextWrapping="Wrap" Text="Click Reboot to stop the task sequence and reboot the computer" VerticalAlignment="Top" Width="425"/>
+        <Button x:Name="RebootButton" Content="Reboot" Margin="264,165,87,26" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <TextBlock HorizontalAlignment="Left" Margin="10,107,0,0" TextWrapping="Wrap" Text="Click Continue to procede with the deployment of the operating system" VerticalAlignment="Top" Width="435"/>
+
+    </Grid>
+</Window>
+'@
+		DisplayWindow -inputXML $window -ContinueButtonName "ContinueButton" -RebootButtonName "RebootButton"
+
+		#Process the results of the dialog window
+		#If the Reboot button is selected, end the script with an exit code of 1 to end the task sequence
+		#If the Continue button is selected, do nothing and exit the script normally to allow the task sequence to continue
+		If ($Global:FormResult -eq "Reboot"){
+			Exit 1
+		}
 	}
 
 	#If UEFI is enabled and SecureBoot check passed (if checked) then exit the script w/o any error codes
-	Exit
+	#Exit
 }

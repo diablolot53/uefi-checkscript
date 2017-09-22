@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace WpfDebugWindow
 {
     /// <summary>
-    /// Interaction logic for SecureBootNotification.xaml
+    /// Interaction logic for UEFINotification.xaml
     /// </summary>
-    public partial class SecureBootNotification : Window
+    public partial class UEFINotification : Window
     {
-        public SecureBootNotification()
+        public UEFINotification()
         {
             InitializeComponent();
         }

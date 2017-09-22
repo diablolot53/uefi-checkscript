@@ -5,10 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfDebugWindow"
         mc:Ignorable="d"
-        Title="UEFI Error" Height="187.5" Width="349.794" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-    <Grid Margin="10,10,8,8">
-        <Label Content="UEFI is currently disabled&#xD;&#xA;" Margin="19,10,0,0" VerticalAlignment="Top" Height="27" Width="250" HorizontalContentAlignment="Center" HorizontalAlignment="Left"/>
-        <Label Content="Please reboot the system and enable UEFI from the &#xD;&#xA;firmware interface" Margin="10,37,4,0" VerticalAlignment="Top" Height="38" FontSize="11"/>
+        Title="UEFI Error" Height="187.5" Width="349.794" WindowStartupLocation="CenterScreen" ResizeMode="NoResize" HorizontalAlignment="Center">
+    <Grid Margin="10,10,4,0" Height="141" VerticalAlignment="Top">
+        <Label Content="UEFI is currently disabled&#xD;&#xA;" Margin="19,10,0,0" VerticalAlignment="Top" Height="27" Width="250" HorizontalContentAlignment="Center" HorizontalAlignment="Center"/>
+        <Label Content="Please reboot the system and enable UEFI from the &#xD;&#xA;firmware interface" Margin="10,37,4,0" VerticalAlignment="Top" Height="38" FontSize="11" HorizontalAlignment="Center"/>
         <Button x:Name="OkButton" Content="Ok" Margin="114,93,0,10" Width="94" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left"/>
 
     </Grid>
