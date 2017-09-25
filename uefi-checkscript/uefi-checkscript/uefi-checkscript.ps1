@@ -1,4 +1,5 @@
 #uefi-checkscript
+#https://github.com/diablolot53/uefi-checkscript
 
 #This script can be used in an SCCM task sequence to see if WinPE was booted in UEFI or BIOS mode
 #------------------------------------------------------------------------------------------------------------
@@ -232,7 +233,8 @@ Else{
 	$SecureBootResult = "Not Checked"
 }
 
-#Display Results if the Debug parameter is set
+#Display results if the Debug parameter is set
+#If not set, then only show the display is there is an error
 If ($Debug -eq $True){
 	#XML copied from the MainWindow.xaml file
 	$window = @"
@@ -286,6 +288,13 @@ If ($Debug -eq $True){
 }
 Else{
 	#Return results of the UEFI check
+	#Hide the task sequence progress window
+	Try{
+		$TSProgressUI = New-Object -COMObject Microsoft.SMS.TSProgressUI -ErrorAction SilentlyContinue
+		$TSProgressUI.CloseProgressDialog()
+	}
+	Catch{}
+
 	#If UEFI is not enabled, display a notification and exit the script with an error
 	If ($UEFIResults -ne "UEFI"){
 		#Display a notification window
