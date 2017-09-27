@@ -11,4 +11,4 @@ The following modules are required for WinPE
 * WinPE-SecureBootCmdlets
 * WinPE-HTA
 
-#### [TechNet - WinPE: Add packages](https://technet.microsoft.com/en-us/library/hh824926.aspx)
+#### [TechNet - WinPE: Add packages](https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/winpe-add-packages--optional-components-reference)
